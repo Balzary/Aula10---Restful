@@ -3,8 +3,10 @@ package br.com.fiap.resource;
 import java.util.List;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -16,7 +18,7 @@ import javax.ws.rs.core.UriInfo;
 
 @Path("/produto")
 public class ProdutoResource {
-	private EstoqueBO estoqueBo = new EstoqueBO();
+	private EstoqueBO estoqueBo = EstoqueBO.getInstance();
 
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
@@ -34,7 +36,7 @@ public class ProdutoResource {
 	@POST	
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response cadastrar(ProdutoTO produto, @Context UriInfo uriInfo) {
-		//EstoqueBO.cadastrar(produto);
+		estoqueBo.cadastrar(produto);
 		System.out.println(produto.getCodigo());
 		System.out.println(produto.getDescricao());
 		System.out.println(produto.getPreco());
@@ -42,5 +44,21 @@ public class ProdutoResource {
 		UriBuilder builder = uriInfo.getAbsolutePathBuilder();
 		builder.path(Integer.toString(produto.getCodigo()));
 		return Response.created(builder.build()).build();
+	}
+	
+	@PUT
+	@Path("{/id}")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response atualizar(ProdutoTO produto, @PathParam("id")int codigo) {
+		produto.setCodigo(codigo);
+		estoqueBo.atualizar(produto);
+		return Response.ok().build();
+	}
+	
+	
+	@DELETE
+	@Path("{/id}")
+	public void remover(@PathParam("id") int codigo) {
+		estoqueBo.remover(codigo);
 	}
 }
